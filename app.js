@@ -1,28 +1,34 @@
 
 const express = require("express");
-const mongoose = require("mongoose");
-const bodyParser = require('body-parser');
-
+//создаем сервер
 const app = express();
-const { PORT = 3005} = process.env;//если порт прописанный в json не доступенб используй 3005 порт
+//если порт прописанный в json не доступенб используй 3005 порт
+const { PORT = 3005} = process.env;
+const mongoose = require("mongoose");
+//const bodyParser = require('body-parser');
+const router = require('./routes');
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-
-
-app.use((req, res, next) => {
-  req.user = {
-    _id: '5d8b8592978f8bd833ca8133' // вставьте сюда _id созданного в предыдущем пункте пользователя
-  };
-
-  next();
-});
 app.use(express.json())
 
 // подключаемся к серверу mongo
-mongoose.connect("mongodb://localhost:27017/mestodb");
+mongoose.connect('mongodb://127.0.0.1:27017/mestodb')
+.then(() => { console.log('MONGO START')})
+.catch(() => { console.log('MONGO ERROR')});
 
-app.listen(PORT, () => {
-  console.log(`SERVER START ON PORT: ${PORT}`);
+// установим себе id
+app.use((req, res, next) => {
+  req.user = {
+    _id: '6448c9ddb58c7aa9c992a868'
+  };
+  next();
 });
-//
+
+module.exports.createCard = (req, res) => {
+  console.log(req.user._id); // _id станет доступен
+};
+app.use(router);
+
+//слушаем и показываем на каком порту запустился сервер
+app.listen(PORT, () => {
+  console.log(`SERVER START ON PORT =>> ${PORT}`);
+});
