@@ -24,7 +24,7 @@ charset = utf-8
 # Denotes whether to trim whitespace at the end of lines
 # Possible values - true, false
 trim_trailing_whitespace = true
-
+quote_type = single
 [*.md]
 trim_trailing_whitespace = false
 
