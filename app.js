@@ -1,13 +1,13 @@
 const express = require('express');
 
 const app = express();
-const { PORT = 3005 } = process.env;
+const { PORT = 3000 } = process.env;
 const mongoose = require('mongoose');
 const router = require('./routes');
 
 app.use(express.json());
 
-mongoose.connect('mongodb://localhost:27017/mestodb');
+mongoose.connect('mongodb://127.0.0.1:27017/mestodb')
 
 app.use((req, res, next) => {
   req.user = {
