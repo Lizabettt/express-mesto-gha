@@ -6,12 +6,12 @@ const createCard = (req, res) => {
   return Card.create({ name, link, owner })
     .then((card) => res.status(201).send({ card }))
     .catch((err) => {
-      if (err.message === 'ValidationError') {
+      if (err.name === 'ValidationError') {
         res.status(400).send({
           message: 'Переданы некорректные данные при создании карточки.',
         });
       } else {
-        res.status(500).send({ message: 'Что-то на серверной стороне' });
+        res.status(500).send({ message: 'Что-то на серверной стороне...' });
       }
     });
 };
@@ -20,26 +20,27 @@ const getCards = (req, res) => {
   Card.find({})
     .then((cards) => res.send({ cards }))
     .catch(() => {
-      res.status(500).send({ message: 'Что-то на серверной стороне' });
+      res.status(500).send({ message: 'Что-то на серверной стороне...' });
     });
 };
 
 const deleteCard = (req, res) => {
   const { cardId } = req.params;
   Card.findByIdAndRemove(cardId)
-    .orFail(() => {
-      throw new Error('Не найден');
-    })
-    .then((cards) => res.send({ cards }))
-    .catch((err) => {
-      if (err.message === 'Не найден') {
+    .then((card) => {
+      if (!card) {
         res
           .status(404)
-          .send({ message: 'Карточка с указанным _id не найдена.' });
+          .send({ message: ' Карточка с указанным _id не найдена.' });
+      } else if (!card.owner.equals(req.user._id)) {
+        res
+          .status(400)
+          .send({ message: 'Удалять можно только свои карточки.' });
       } else {
-        res.status(500).send({ message: 'Что-то на серверной стороне' });
+        res.send({ card });
       }
-    });
+    })
+    .catch(() => res.status(500).send({ message: 'Что-то на серверной стороне...' }));
 };
 
 const onLikedCard = (req, res) => {
@@ -48,17 +49,22 @@ const onLikedCard = (req, res) => {
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
-    .orFail(() => {
-      throw new Error('Передан несуществующий _id карточки.');
+    .then((card) => {
+      if (!card) {
+        res
+          .status(404)
+          .send({ message: 'Передан несуществующий _id карточки.' });
+      } else {
+        res.send({ card });
+      }
     })
-    .then((card) => res.send({ card }))
     .catch((err) => {
-      if (err.message === 'Передан несуществующий _id карточки.') {
+      if (err.name === 'CastError') {
         res.status(400).send({
           message: 'Переданы некорректные данные для постановки лайка',
         });
       } else {
-        res.status(500).send({ message: 'Что-то на серверной стороне' });
+        res.status(500).send({ message: 'Что-то на серверной стороне...' });
       }
     });
 };
@@ -69,17 +75,22 @@ const offLikedCard = (req, res) => {
     { $pull: { likes: req.user._id } },
     { new: true },
   )
-    .orFail(() => {
-      throw new Error('Передан несуществующий _id карточки.');
-    })
-    .then((card) => res.send({ card }))
-    .catch((err) => {
-      if (err.message === 'Передан несуществующий _id карточки.') {
+    .then((card) => {
+      if (!card) {
         res
-          .status(400)
-          .send({ message: 'Переданы некорректные данные для снятия лайка' });
+          .status(404)
+          .send({ message: 'Передан несуществующий _id карточки.' });
       } else {
-        res.status(500).send({ message: 'Что-то на серверной стороне' });
+        res.send({ card });
+      }
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(400).send({
+          message: 'Переданы некорректные данные для снятия лайка',
+        });
+      } else {
+        res.status(500).send({ message: 'Что-то на серверной стороне...' });
       }
     });
 };
