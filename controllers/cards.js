@@ -1,4 +1,5 @@
 const Card = require('../models/cards');
+const { NotFound, BadRequest, ServerError } = require('../errors');
 
 const createCard = (req, res) => {
   const { name, link } = req.body;
@@ -7,11 +8,11 @@ const createCard = (req, res) => {
     .then((card) => res.status(201).send({ card }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({
+        res.status(BadRequest).send({
           message: 'Переданы некорректные данные при создании карточки.',
         });
       } else {
-        res.status(500).send({ message: 'Что-то на серверной стороне...' });
+        res.status(ServerError).send({ message: 'Что-то на серверной стороне...' });
       }
     });
 };
@@ -20,7 +21,7 @@ const getCards = (req, res) => {
   Card.find({})
     .then((cards) => res.send({ cards }))
     .catch(() => {
-      res.status(500).send({ message: 'Что-то на серверной стороне...' });
+      res.status(ServerError).send({ message: 'Что-то на серверной стороне...' });
     });
 };
 
@@ -30,7 +31,7 @@ const deleteCard = (req, res) => {
     .then((card) => {
       if (!card) {
         res
-          .status(404)
+          .status(NotFound)
           .send({ message: ' Карточка с указанным _id не найдена.' });
       } else {
         res.send({ card });
@@ -38,11 +39,11 @@ const deleteCard = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({
+        res.status(BadRequest).send({
           message: 'Переданы некорректные данные для удаления карточки.',
         });
       } else {
-        res.status(500).send({ message: 'Что-то на серверной стороне...' });
+        res.status(ServerError).send({ message: 'Что-то на серверной стороне...' });
       }
     });
 };
@@ -56,7 +57,7 @@ const onLikedCard = (req, res) => {
     .then((card) => {
       if (!card) {
         res
-          .status(404)
+          .status(NotFound)
           .send({ message: 'Передан несуществующий _id карточки.' });
       } else {
         res.send({ card });
@@ -64,11 +65,11 @@ const onLikedCard = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({
+        res.status(BadRequest).send({
           message: 'Переданы некорректные данные для постановки лайка',
         });
       } else {
-        res.status(500).send({ message: 'Что-то на серверной стороне...' });
+        res.status(ServerError).send({ message: 'Что-то на серверной стороне...' });
       }
     });
 };
@@ -82,7 +83,7 @@ const offLikedCard = (req, res) => {
     .then((card) => {
       if (!card) {
         res
-          .status(404)
+          .status(NotFound)
           .send({ message: 'Передан несуществующий _id карточки.' });
       } else {
         res.send({ card });
@@ -90,11 +91,11 @@ const offLikedCard = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({
+        res.status(BadRequest).send({
           message: 'Переданы некорректные данные для снятия лайка',
         });
       } else {
-        res.status(500).send({ message: 'Что-то на серверной стороне...' });
+        res.status(ServerError).send({ message: 'Что-то на серверной стороне...' });
       }
     });
 };

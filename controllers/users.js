@@ -1,4 +1,5 @@
 const User = require('../models/users');
+const { NotFound, BadRequest, ServerError } = require('../errors');
 
 const createUser = (req, res) => {
   const { name, about, avatar } = req.body;
@@ -6,9 +7,9 @@ const createUser = (req, res) => {
     .then((newUser) => res.status(201).send({ newUser }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Ошибка заполнения поля' });
+        res.status(BadRequest).send({ message: 'Ошибка заполнения поля' });
       } else {
-        res.status(500).send({ message: 'Что-то на серверной стороне...' });
+        res.status(ServerError).send({ message: 'Что-то на серверной стороне...' });
       }
     });
 };
@@ -17,15 +18,23 @@ const getUsers = (req, res) => {
   User.find({})
     .then((users) => res.send({ users }))
     .catch(() => {
-      res.status(500).send({ message: 'Что-то на серверной стороне...' });
+      res.status(ServerError).send({ message: 'Что-то на серверной стороне...' });
     });
 };
 
 const getUserMy = (req, res) => {
   User.findById(req.user._id)
-    .then((user) => res.send({ user }))
+    .then((user) => {
+      if (!user) {
+        res
+          .status(NotFound)
+          .send({ message: 'Пользователь по указанному _id не найден' });
+      } else {
+        res.send({ user });
+      }
+    })
     .catch(() => {
-      res.status(404).send({ message: 'Пользователь потерян...' });
+      res.status(ServerError).send({ message: 'Что-то на серверной стороне...' });
     });
 };
 
@@ -35,7 +44,7 @@ const getUserId = (req, res) => {
     .then((user) => {
       if (!user) {
         res
-          .status(404)
+          .status(NotFound)
           .send({ message: 'Пользователь по указанному _id не найден' });
       } else {
         res.send({ user });
@@ -43,9 +52,9 @@ const getUserId = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Переданы некорректные данные' });
+        res.status(BadRequest).send({ message: 'Переданы некорректные данные' });
       } else {
-        res.status(500).send({ message: 'Что-то на серверной стороне...' });
+        res.status(ServerError).send({ message: 'Что-то на серверной стороне...' });
       }
     });
 };
@@ -60,7 +69,7 @@ const changeUserData = (req, res) => {
     .then((user) => {
       if (!user) {
         res
-          .status(404)
+          .status(NotFound)
           .send({ message: 'Пользователь по указанному _id не найден' });
       } else {
         res.send({ user });
@@ -68,12 +77,12 @@ const changeUserData = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({
+        res.status(BadRequest).send({
           message: 'Переданы некорректные данные при обновлении профиля',
         });
         return;
       }
-      res.status(500).send({ message: 'Что-то на серверной стороне...' });
+      res.status(ServerError).send({ message: 'Что-то на серверной стороне...' });
     });
 };
 
@@ -87,7 +96,7 @@ const changeAvatar = (req, res) => {
     .then((user) => {
       if (!user) {
         res
-          .status(404)
+          .status(NotFound)
           .send({ message: 'Пользователь по указанному _id не найден' });
       } else {
         res.send({ user });
@@ -95,12 +104,12 @@ const changeAvatar = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({
+        res.status(BadRequest).send({
           message: 'Переданы некорректные данные при обновлении профиля',
         });
         return;
       }
-      res.status(500).send({ message: 'Что-то на серверной стороне...' });
+      res.status(ServerError).send({ message: 'Что-то на серверной стороне...' });
     });
 };
 module.exports = {
