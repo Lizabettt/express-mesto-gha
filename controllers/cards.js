@@ -32,15 +32,19 @@ const deleteCard = (req, res) => {
         res
           .status(404)
           .send({ message: ' Карточка с указанным _id не найдена.' });
-      } else if (!card.owner.equals(req.user._id)) {
-        res
-          .status(400)
-          .send({ message: 'Удалять можно только свои карточки.' });
       } else {
         res.send({ card });
       }
     })
-    .catch(() => res.status(500).send({ message: 'Что-то на серверной стороне...' }));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(400).send({
+          message: 'Переданы некорректные данные для удаления карточки.',
+        });
+      } else {
+        res.status(500).send({ message: 'Что-то на серверной стороне...' });
+      }
+    });
 };
 
 const onLikedCard = (req, res) => {
