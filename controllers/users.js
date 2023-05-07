@@ -25,7 +25,6 @@ const createUser = (req, res) => {
           _id: newUser._id,
         }))
         .catch((err) => {
-        // надо сделать error.code === 11000
           if (err.code === 11000) {
             res.status(Conflict).send({ message: 'Пользователь с такими данными уже зарегистрирован' });
           } else if (err.name === 'ValidationError') {
