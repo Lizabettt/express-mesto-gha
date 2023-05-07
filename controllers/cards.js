@@ -1,5 +1,7 @@
 const Card = require('../models/cards');
-const { NotFound, BadRequest, ServerError, Forbiden } = require('../errors');
+const {
+  NotFound, BadRequest, ServerError, Forbiden,
+} = require('../errors');
 
 const createCard = (req, res) => {
   const { name, link } = req.body;

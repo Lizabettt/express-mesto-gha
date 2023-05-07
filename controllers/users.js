@@ -1,38 +1,42 @@
-const User = require('../models/users');
-
-const {Conflict, BadRequest, ServerError, NotFound } = require('../errors')
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken'); // импортируем модуль jsonwebtoken
+const User = require('../models/users');
+
+const {
+  Conflict, BadRequest, ServerError, NotFound, AuthorizationError,
+} = require('../errors');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 
 const createUser = (req, res) => {
-  const { name, about, avatar, email, password } = req.body;
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
   return bcrypt.hash(password, 10)
-  .then((hash) => {
-    User.create({ name, about, avatar, email, password: hash }) // записываем хеш в базу
-      .then((newUser) =>
-        res.status(201).send({
+    .then((hash) => {
+      User.create({
+        name, about, avatar, email, password: hash,
+      }) // записываем хеш в базу
+        .then((newUser) => res.status(201).send({
           name: newUser.name,
           about: newUser.about,
           avatar: newUser.avatar,
           email: newUser.email,
           _id: newUser._id,
-        })
-      )
-      .catch((err) => {
-        //надо сделать error.code === 11000
-        if (err.code === 11000) {
-          res.status(Conflict).send({ message: 'Пользователь с такими данными уже зарегистрирован'})
-        } else if (err.name === 'ValidationError') {
-          res.status(BadRequest).send({ message: 'Ошибка заполнения поля' });
-        } else {
-          res
-            .status(ServerError)
-            .send({ message: 'Что-то на серверной стороне...' });
-        }
-      });
-  });
+        }))
+        .catch((err) => {
+        // надо сделать error.code === 11000
+          if (err.code === 11000) {
+            res.status(Conflict).send({ message: 'Пользователь с такими данными уже зарегистрирован' });
+          } else if (err.name === 'ValidationError') {
+            res.status(BadRequest).send({ message: 'Ошибка заполнения поля' });
+          } else {
+            res
+              .status(ServerError)
+              .send({ message: 'Что-то на серверной стороне...' });
+          }
+        });
+    });
 };
 
 const login = (req, res) => {
@@ -50,11 +54,13 @@ const login = (req, res) => {
           // хеши не совпали
           return new AuthorizationError('Неверные почта или пароль');
         }
-        const token = jwt.sign({ _id: user._id },
+        const token = jwt.sign(
+          { _id: user._id },
           NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
           {
-          expiresIn: '3d', // 3 дня -это время, в течение которого токен остаётся действительным.
-        });
+            expiresIn: '3d', // 3 дня -это время, в течение которого токен остаётся действительным.
+          },
+        );
         res.cookie('auth', token, {
           maxAge: 3600000 * 24 * 7,
           httpOnly: true,
@@ -127,7 +133,7 @@ const changeUserData = (req, res) => {
   User.findByIdAndUpdate(
     req.user._id,
     { name, about },
-    { new: true, runValidators: true }
+    { new: true, runValidators: true },
   )
     .then((user) => {
       if (!user) {
@@ -156,7 +162,7 @@ const changeAvatar = (req, res) => {
   User.findByIdAndUpdate(
     req.user._id,
     { avatar },
-    { new: true, runValidators: true }
+    { new: true, runValidators: true },
   )
     .then((user) => {
       if (!user) {
@@ -186,5 +192,5 @@ module.exports = {
   getUserMy,
   changeUserData,
   changeAvatar,
-  login
+  login,
 };

@@ -1,8 +1,8 @@
 const userRouter = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
+// eslint-disable-next-line
 const regURL = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
 const {
- // createUser,
   getUsers,
   getUserId,
   getUserMy,
@@ -10,7 +10,6 @@ const {
   changeAvatar,
 } = require('../controllers/users');
 
-//userRouter.post('/', createUser);
 userRouter.get('/', getUsers);
 userRouter.get(
   '/:userId',
@@ -19,7 +18,7 @@ userRouter.get(
       id: Joi.string().hex().length(24).required(),
     }),
   }),
-  getUserId
+  getUserId,
 );
 userRouter.get('/me', getUserMy);
 userRouter.patch(
@@ -30,7 +29,7 @@ userRouter.patch(
       about: Joi.string().min(2).max(30).required(),
     }),
   }),
-  changeUserData
+  changeUserData,
 );
 userRouter.patch(
   '/me/avatar',
@@ -39,7 +38,7 @@ userRouter.patch(
       avatar: Joi.string().regex(regURL),
     }),
   }),
-  changeAvatar
+  changeAvatar,
 );
 
 module.exports = userRouter;

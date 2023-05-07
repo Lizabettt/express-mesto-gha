@@ -33,7 +33,7 @@ const userSchema = new mongoose.Schema({
   email: {
     type: String,
     required: true,
-    unique: true, //уникальное поле
+    unique: true, // уникальное поле
     validate: {
       validator: (v) => isEmail(v),
       message: 'Неправильный формат почты',
@@ -42,31 +42,29 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true,
-    select: false, //Так по умолчанию хеш пароля пользователя не будет возвращаться из базы
+    select: false, // Так по умолчанию хеш пароля пользователя не будет возвращаться из базы
   },
 });
 
-userSchema.statics.findUserByCredentials = function (email, password) {
-  return this.findOne({ email }).then((user) => {
-    // получаем объект пользователя, если почта и пароль подошли
-    if (!user) {
-      // не нашёлся — отклоняем промис
-      return Promise.reject(
-        new AuthorizationError('Неправильные почта или пароль')
-      );
-    }
-
-    return bcrypt
-      .compare(password, user.password) // нашёлся — сравниваем хеши
-      .then((matched) => {
-        if (!matched) {
-          return Promise.reject(
-            new AuthorizationError('Неправильные почта или пароль')
-          );
-        }
-        return user; // теперь user доступен
-      });
-  });
+userSchema.statics.findUserByCredentials = function findOne(email, password) {
+  return this.findOne({ email })
+    .then((user) => { // получаем объект пользователя, если почта и пароль подошли
+      if (!user) { // не нашёлся — отклоняем промис
+        return Promise.reject(
+          new AuthorizationError('Неправильные почта или пароль'),
+        );
+      }
+      return bcrypt
+        .compare(password, user.password) // нашёлся — сравниваем хеши
+        .then((matched) => {
+          if (!matched) {
+            return Promise.reject(
+              new AuthorizationError('Неправильные почта или пароль'),
+            );
+          }
+          return user; // теперь user доступен
+        });
+    });
 };
 
 module.exports = mongoose.model('user', userSchema);

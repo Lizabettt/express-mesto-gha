@@ -1,10 +1,11 @@
 const jwt = require('jsonwebtoken');
 const { AuthorizationError } = require('../errors');
+
 const { NODE_ENV, JWT_SECRET } = process.env;
 
 module.exports = (req, res, next) => {
   const { authorization } = req.headers; // достаём авторизационный заголовок
-console.log(req.headers)
+
   if (!authorization || !authorization.startsWith('Bearer ')) {
     // убеждаемся, что он есть или начинается с Bearer
     throw new AuthorizationError('Необходима авторизация');
