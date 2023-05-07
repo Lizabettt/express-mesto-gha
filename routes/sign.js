@@ -1,0 +1,26 @@
+const signRouter = require('express').Router();
+const { login, createUser } = require('../controllers/users');
+const { celebrate, Joi } = require('celebrate');
+const regURL= /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/;
+const regEmail = /^\S+@\S+\.\S+$/;
+
+signRouter.post('/signin',
+celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email().regex(regEmail),
+    password: Joi.string().required(),
+  }),
+}), login);
+
+signRouter.post('/signup',
+celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().min(2).max(30),
+    about: Joi.string().min(2).max(30),
+    avatar: Joi.string().regex(regURL).required(),
+    email: Joi.string().required().email(),
+    password: Joi.string().required(),
+  }),
+}), createUser);
+
+module.exports = signRouter;

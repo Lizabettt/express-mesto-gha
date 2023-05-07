@@ -1,5 +1,5 @@
 const Card = require('../models/cards');
-const { NotFound, BadRequest, ServerError } = require('../errors');
+const { NotFound, BadRequest, ServerError, Forbiden } = require('../errors');
 
 const createCard = (req, res) => {
   const { name, link } = req.body;
@@ -35,6 +35,15 @@ const deleteCard = (req, res) => {
           .send({ message: ' Карточка с указанным _id не найдена.' });
       } else {
         res.send({ card });
+        const owner = card.owner.toString();
+        if (req.user._id === owner) {
+          Card.deleteOne(card)
+            .then(() => {
+              res.send({ card });
+            });
+        } else {
+          throw new Forbiden('Чужие карточки удалить нельзя!');
+        }
       }
     })
     .catch((err) => {
