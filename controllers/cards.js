@@ -1,48 +1,40 @@
 const Card = require('../models/cards');
-const {
-  NotFound, BadRequest, ServerError, Forbiden,
-} = require('../errors');
+const { NotFound, BadRequest, Forbiden } = require('../errors');
 
-const createCard = (req, res) => {
+const createCard = (req, res, next) => {
   const { name, link } = req.body;
   const owner = req.user._id;
   return Card.create({ name, link, owner })
     .then((card) => res.status(201).send({ card }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(BadRequest).send({
-          message: 'Переданы некорректные данные при создании карточки.',
-        });
-      } else {
-        res.status(ServerError).send({ message: 'Что-то на серверной стороне...' });
+        next(
+          new BadRequest('Переданы некорректные данные при создании карточки.'),
+        );
       }
+      next(err);
     });
 };
 
-const getCards = (req, res) => {
+const getCards = (req, res, next) => {
   Card.find({})
     .then((cards) => res.send({ cards }))
-    .catch(() => {
-      res.status(ServerError).send({ message: 'Что-то на серверной стороне...' });
-    });
+    .catch(next);
 };
 
-const deleteCard = (req, res) => {
+const deleteCard = (req, res, next) => {
   const { cardId } = req.params;
   Card.findByIdAndRemove(cardId)
     .then((card) => {
       if (!card) {
-        res
-          .status(NotFound)
-          .send({ message: ' Карточка с указанным _id не найдена.' });
+        throw new NotFound('Карточка с указанным _id не найдена.');
       } else {
         res.send({ card });
         const owner = card.owner.toString();
         if (req.user._id === owner) {
-          Card.deleteOne(card)
-            .then(() => {
-              res.send({ card });
-            });
+          Card.deleteOne(card).then(() => {
+            res.send({ card });
+          });
         } else {
           throw new Forbiden('Чужие карточки удалить нельзя!');
         }
@@ -50,16 +42,14 @@ const deleteCard = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(BadRequest).send({
-          message: 'Переданы некорректные данные для удаления карточки.',
-        });
-      } else {
-        res.status(ServerError).send({ message: 'Что-то на серверной стороне...' });
-      }
+        next(
+          new BadRequest('Переданы некорректные данные для удаления карточки.'),
+        );
+      } next(err);
     });
 };
 
-const onLikedCard = (req, res) => {
+const onLikedCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } },
@@ -67,25 +57,21 @@ const onLikedCard = (req, res) => {
   )
     .then((card) => {
       if (!card) {
-        res
-          .status(NotFound)
-          .send({ message: 'Передан несуществующий _id карточки.' });
+        throw new NotFound('Передан несуществующий _id карточки.');
       } else {
         res.send({ card });
       }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(BadRequest).send({
-          message: 'Переданы некорректные данные для постановки лайка',
-        });
-      } else {
-        res.status(ServerError).send({ message: 'Что-то на серверной стороне...' });
-      }
+        next(
+          new BadRequest('Переданы некорректные данные для постановки лайка'),
+        );
+      } next(err);
     });
 };
 
-const offLikedCard = (req, res) => {
+const offLikedCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } },
@@ -93,21 +79,17 @@ const offLikedCard = (req, res) => {
   )
     .then((card) => {
       if (!card) {
-        res
-          .status(NotFound)
-          .send({ message: 'Передан несуществующий _id карточки.' });
+        throw new NotFound('Карточка с указанным _id не найдена.');
       } else {
         res.send({ card });
       }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(BadRequest).send({
-          message: 'Переданы некорректные данные для снятия лайка',
-        });
-      } else {
-        res.status(ServerError).send({ message: 'Что-то на серверной стороне...' });
-      }
+        next(
+          new BadRequest('Переданы некорректные данные для снятия лайка'),
+        );
+      } next(err);
     });
 };
 

@@ -15,9 +15,12 @@ const auth = (req, res, next) => {
   let payload;
 
   try {
-    payload = jwt.verify(token, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret'); // попытаемся верифицировать токен
+    payload = jwt.verify(
+      token,
+      NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
+    ); // попытаемся верифицировать токен
   } catch (err) {
-     return next(new AuthorizationError('Необходима авторизация')); // отправим ошибку, если не получилось
+    return next(new AuthorizationError('Необходима авторизация')); // отправим ошибку, если не получилось
   }
 
   req.user = payload; // записываем пейлоуд в объект запроса
