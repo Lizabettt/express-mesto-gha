@@ -9,10 +9,8 @@ const {
 const { NODE_ENV, JWT_SECRET } = process.env;
 
 const createUser = (req, res) => {
-  const {
-    name, about, avatar, email, password,
-  } = req.body;
-  return bcrypt.hash(password, 10)
+  const {name, about, avatar, email, password} = req.body;
+  bcrypt.hash(password, 10)
     .then((hash) => {
       User.create({
         name, about, avatar, email, password: hash,
@@ -26,11 +24,11 @@ const createUser = (req, res) => {
         }))
         .catch((err) => {
           if (err.code === 11000) {
-            res.status(Conflict).send({ message: 'Пользователь с такими данными уже зарегистрирован' });
+            return res.status(Conflict).send({ message: 'Пользователь с такими данными уже зарегистрирован' });
           } else if (err.name === 'ValidationError') {
-            res.status(BadRequest).send({ message: 'Ошибка заполнения поля' });
+            return res.status(BadRequest).send({ message: 'Ошибка заполнения поля' });
           } else {
-            res
+            return res
               .status(ServerError)
               .send({ message: 'Что-то на серверной стороне...' });
           }
@@ -46,12 +44,12 @@ const login = (req, res) => {
     .then((user) => {
       // аутентификация успешна! пользователь в переменной user
       if (!user) {
-        throw new AuthorizationError('Неверные почта или пароль');
+        res.status(AuthorizationError).send({message:'Неверные почта или пароль'});
       }
       return bcrypt.compare(password, user.password).then((matched) => {
         if (!matched) {
           // хеши не совпали
-          return new AuthorizationError('Неверные почта или пароль');
+          res.status(AuthorizationError).send({message:'Неверные почта или пароль'});
         }
         const token = jwt.sign(
           { _id: user._id },

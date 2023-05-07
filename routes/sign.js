@@ -10,7 +10,7 @@ signRouter.post(
   '/signin',
   celebrate({
     body: Joi.object().keys({
-      email: Joi.string().required().email().regex(regEmail),
+      email: Joi.string().required().email(),
       password: Joi.string().required(),
     }),
   }),
@@ -24,7 +24,7 @@ signRouter.post(
       name: Joi.string().min(2).max(30),
       about: Joi.string().min(2).max(30),
       avatar: Joi.string().regex(regURL),
-      email: Joi.string().required().email(),
+      email: Joi.string().required().regex(regEmail),
       password: Joi.string().required(),
     }),
   }),
