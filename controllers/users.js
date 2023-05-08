@@ -1,15 +1,16 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/users');
-console.log(User);
+
+// console.log(User);
 const {
   Conflict,
   BadRequest,
   NotFound,
-  AuthorizationError,
+//  AuthorizationError,
 } = require('../errors');
 
-const {JWT_SECRET } = process.env;
+const { JWT_SECRET } = process.env;
 
 const createUser = (req, res, next) => {
   const {
@@ -49,34 +50,23 @@ const login = (req, res, next) => {
   const { email, password } = req.body;
   console.log(req.body);
   User.findUserByCredentials(email, password)
-    // .select('+password')
     .then((user) => {
       console.log(user);
-      // аутентификация успешна! пользователь в переменной user
-      // if (!user) {
-      //   return next(
-      //     AuthorizationError('Неверные почта или пароль'),
-      //   );
-      // }
-      // return bcrypt.compare(password, user.password).then((matched) => {
-      //   if (!matched) {
-      //     // хеши не совпали
-      //     next(new AuthorizationError('Неверные почта или пароль'));
-      //   }
-        const token = jwt.sign(
-          { _id: user._id },
-          JWT_SECRET,
-          {
-            expiresIn: '7d', // 7 дня -это время, в течение которого токен остаётся действительным.
-          },
-        );
-        res.cookie('auth', token, {
-          maxAge: 3600000 * 24 * 7,
-          httpOnly: true,
-        });
-        return res.send({ token }); // аутентификация успешна
-      })
-//    })
+
+      const token = jwt.sign(
+        { _id: user._id },
+        JWT_SECRET,
+        {
+          expiresIn: '7d', // 7 дня -это время, в течение которого токен остаётся действительным.
+        },
+      );
+      // res.cookie('auth', token, {
+      //   maxAge: 3600000 * 24 * 7,
+      //   httpOnly: true,
+      // });
+      res.send({ token }); // аутентификация успешна
+    })
+  //    })
     .catch(next); // ошибка аутентификации
 };
 

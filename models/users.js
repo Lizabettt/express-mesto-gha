@@ -1,7 +1,5 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
-const isEmail = require('validator/lib/isEmail');
-const isURL = require('validator/lib/isURL');
 const validator = require('validator');
 const AuthorizationError = require('../errors/authorizationError');
 
@@ -49,7 +47,7 @@ const userSchema = new mongoose.Schema({
 
 userSchema.statics.findUserByCredentials = function (email, password) {
   return this.findOne({ email })
-  .select('+password')
+    .select('+password')
     .then((user) => { // получаем объект пользователя, если почта и пароль подошли
       if (!user) { // не нашёлся — отклоняем промис
         return Promise.reject(

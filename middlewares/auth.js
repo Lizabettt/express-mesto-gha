@@ -2,11 +2,10 @@ const jwt = require('jsonwebtoken');
 const { AuthorizationError } = require('../errors');
 
 const { JWT_SECRET } = process.env;
-console.log (JWT_SECRET);
+// console.log(JWT_SECRET);
 
 const auth = (req, res, next) => {
   const { authorization } = req.headers; // достаём авторизационный заголовок
-
   if (!authorization || !authorization.startsWith('Bearer ')) {
     // убеждаемся, что он есть или начинается с Bearer
     return next(
@@ -29,7 +28,7 @@ const auth = (req, res, next) => {
   }
 
   req.user = payload; // записываем пейлоуд в объект запроса
-  console.log(req.user)
+  // console.log(req.user);
 
   return next(); // пропускаем запрос дальше
 };

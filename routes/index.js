@@ -1,10 +1,10 @@
 const router = require('express').Router();
+const { celebrate, Joi } = require('celebrate');
 const userRouter = require('./users');
 const cardRouter = require('./cards');
 const auth = require('../middlewares/auth');
-const { celebrate, Joi } = require('celebrate');
 const { login, createUser } = require('../controllers/users');
-const { NotFound } = require ('../errors')
+const { NotFound } = require('../errors');
 // eslint-disable-next-line
 const regURL = /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/;
 // eslint-disable-next-line
@@ -38,7 +38,7 @@ router.post(
 router.use('/users', auth, userRouter);
 router.use('/cards', auth, cardRouter);
 router.use('*', (req, res, next) => {
-    next(new NotFound('Такой страницы не существует'));
-  });
+  next(new NotFound('Такой страницы не существует'));
+});
 
 module.exports = router;
