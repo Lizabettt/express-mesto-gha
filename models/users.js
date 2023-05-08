@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const isEmail = require('validator/lib/isEmail');
 const isURL = require('validator/lib/isURL');
+const validator = require('validator');
 const AuthorizationError = require('../errors/authorizationError');
 
 const userSchema = new mongoose.Schema({
@@ -26,7 +27,7 @@ const userSchema = new mongoose.Schema({
     required: true,
     minlength: 2,
     validate: {
-      validator: (url) => isURL(url),
+      validator: validator.isURL,
       message: 'Введёнa некорректная ссылка',
     },
   },
@@ -35,7 +36,7 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true, // уникальное поле
     validate: {
-      validator: (email) => isEmail(email),
+      validator: validator.isEmail,
       message: 'Неправильный формат почты',
     },
   },
@@ -46,8 +47,9 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-userSchema.statics.findUserByCredentials = function findOne(email, password) {
+userSchema.statics.findUserByCredentials = function (email, password) {
   return this.findOne({ email })
+  .select('+password')
     .then((user) => { // получаем объект пользователя, если почта и пароль подошли
       if (!user) { // не нашёлся — отклоняем промис
         return Promise.reject(
