@@ -35,8 +35,10 @@ const createUser = (req, res, next) => {
           next(
             new Conflict('Пользователь с такими данными уже зарегистрирован'),
           );
-        } else if (err.name === 'ValidationError') {
-          next(new BadRequest('Ошибка заполнения поля'));
+        } if (err.name === 'ValidationError') {
+          next(
+            new BadRequest('Ошибка заполнения поля'),
+          );
         }
         next(err);
       });
@@ -50,12 +52,14 @@ const login = (req, res, next) => {
     .then((user) => {
       // аутентификация успешна! пользователь в переменной user
       if (!user) {
-        throw new AuthorizationError('Неверные почта или пароль');
+        return next(
+          AuthorizationError('Неверные почта или пароль'),
+        );
       }
       return bcrypt.compare(password, user.password).then((matched) => {
         if (!matched) {
           // хеши не совпали
-          throw new AuthorizationError('Неверные почта или пароль');
+          next(new AuthorizationError('Неверные почта или пароль'));
         }
         const token = jwt.sign(
           { _id: user._id },
@@ -84,10 +88,11 @@ const getUserMy = (req, res, next) => {
   User.findById(req.user._id)
     .then((user) => {
       if (!user) {
-        throw new NotFound('Пользователь по указанному _id не найден');
-      } else {
-        res.send({ user });
+        next(
+          new NotFound('Пользователь по указанному _id не найден'),
+        );
       }
+      res.send({ user });
     })
     .catch(next);
 };
@@ -97,10 +102,11 @@ const getUserId = (req, res, next) => {
   User.findById(userId)
     .then((user) => {
       if (!user) {
-        throw new NotFound('Пользователь по указанному _id не найден');
-      } else {
-        res.send({ user });
+        next(
+          new NotFound('Пользователь по указанному _id не найден'),
+        );
       }
+      res.send({ user });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -119,10 +125,9 @@ const changeUserData = (req, res, next) => {
   )
     .then((user) => {
       if (!user) {
-        throw new NotFound('Пользователь по указанному _id не найден');
-      } else {
-        res.send({ user });
+        next(new NotFound('Пользователь по указанному _id не найден'));
       }
+      res.send({ user });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -143,18 +148,19 @@ const changeAvatar = (req, res, next) => {
   )
     .then((user) => {
       if (!user) {
-        throw new NotFound('Пользователь по указанному _id не найден');
-      } else {
-        res.send({ user });
+        next(
+          new NotFound('Пользователь по указанному _id не найден'),
+        );
       }
+      res.send({ user });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(
+        return next(
           new BadRequest('Переданы некорректные данные при обновлении профиля'),
         );
       }
-      next(err);
+      return next(err);
     });
 };
 module.exports = {

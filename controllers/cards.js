@@ -27,7 +27,9 @@ const deleteCard = (req, res, next) => {
   Card.findByIdAndRemove(cardId)
     .then((card) => {
       if (!card) {
-        throw new NotFound('Карточка с указанным _id не найдена.');
+        next(
+          new NotFound('Карточка с указанным _id не найдена.'),
+        );
       } else {
         res.send({ card });
         const owner = card.owner.toString();
@@ -36,7 +38,9 @@ const deleteCard = (req, res, next) => {
             res.send({ card });
           });
         } else {
-          throw new Forbiden('Чужие карточки удалить нельзя!');
+          next(
+            new Forbiden('Чужие карточки удалить нельзя!'),
+          );
         }
       }
     })
@@ -53,11 +57,13 @@ const onLikedCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } },
-    { new: true },
+    { new: true, runValidators: true },
   )
     .then((card) => {
       if (!card) {
-        throw new NotFound('Передан несуществующий _id карточки.');
+        next(
+          new NotFound('Карточка с указанным _id не найдена.'),
+        );
       } else {
         res.send({ card });
       }
@@ -75,11 +81,13 @@ const offLikedCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } },
-    { new: true },
+    { new: true, runValidators: true },
   )
     .then((card) => {
       if (!card) {
-        throw new NotFound('Карточка с указанным _id не найдена.');
+        next(
+          new NotFound('Карточка с указанным _id не найдена.'),
+        );
       } else {
         res.send({ card });
       }

@@ -10,6 +10,7 @@ const { PORT = 3000 } = process.env;
 const mongoose = require('mongoose');
 
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
+
 const rateLimit = require('express-rate-limit');
 //  Чтобы защититься от множества автоматических запросов
 const limiter = rateLimit({
