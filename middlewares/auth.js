@@ -19,7 +19,7 @@ const auth = (req, res, next) => {
   try {
     payload = jwt.verify(
       token,
-      JWT_SECRET,
+      JWT_SECRET || 'JWT_SECRET',
     ); // попытаемся верифицировать токен
   } catch (err) {
     return next(

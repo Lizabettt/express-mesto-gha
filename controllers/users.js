@@ -55,7 +55,7 @@ const login = (req, res, next) => {
 
       const token = jwt.sign(
         { _id: user._id },
-        JWT_SECRET,
+        JWT_SECRET || 'JWT_SECRET',
         {
           expiresIn: '7d', // 7 дня -это время, в течение которого токен остаётся действительным.
         },
