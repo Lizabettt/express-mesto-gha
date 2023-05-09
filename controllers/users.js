@@ -80,7 +80,7 @@ const getUserMy = (req, res, next) => {
   User.findById(req.user._id)
     .then((user) => {
       if (!user) {
-        next(
+        next( // return
           new NotFound('Пользователь по указанному _id не найден'),
         );
       }
@@ -94,7 +94,7 @@ const getUserId = (req, res, next) => {
   User.findById(userId)
     .then((user) => {
       if (!user) {
-        next(
+        next( // return
           new NotFound('Пользователь по указанному _id не найден'),
         );
       }

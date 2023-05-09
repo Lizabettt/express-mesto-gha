@@ -24,14 +24,14 @@ const getCards = (req, res, next) => {
 
 const deleteCard = (req, res, next) => {
   const { cardId } = req.params;
-  Card.deleteOne(cardId)
+  Card.findById(cardId)
     .then((card) => {
       if (!card) {
         next(
           new NotFound('Карточка с указанным _id не найдена.'),
         );
       } else {
-        res.send({ card });
+        //  res.send({ card });
         const owner = card.owner.toString();
         if (req.user._id === owner) {
           Card.deleteOne(card).then(() => {

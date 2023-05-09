@@ -11,6 +11,7 @@ const {
 } = require('../controllers/users');
 
 userRouter.get('/', getUsers);
+userRouter.get('/me', getUserMy);
 userRouter.get(
   '/:userId',
   celebrate({
@@ -20,7 +21,7 @@ userRouter.get(
   }),
   getUserId,
 );
-userRouter.get('/me', getUserMy);
+
 userRouter.patch(
   '/me',
   celebrate({
