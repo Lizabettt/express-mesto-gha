@@ -7,7 +7,7 @@ const {
   Conflict,
   BadRequest,
   NotFound,
-//  AuthorizationError,
+  //  AuthorizationError,
 } = require('../errors');
 
 const { JWT_SECRET } = process.env;
@@ -36,10 +36,9 @@ const createUser = (req, res, next) => {
           next(
             new Conflict('Пользователь с такими данными уже зарегистрирован'),
           );
-        } if (err.name === 'ValidationError') {
-          next(
-            new BadRequest('Ошибка заполнения поля'),
-          );
+        }
+        if (err.name === 'ValidationError') {
+          next(new BadRequest('Ошибка заполнения поля'));
         }
         next(err);
       });
@@ -53,20 +52,16 @@ const login = (req, res, next) => {
     .then((user) => {
       console.log(user);
 
-      const token = jwt.sign(
-        { _id: user._id },
-        JWT_SECRET || 'JWT_SECRET',
-        {
-          expiresIn: '7d', // 7 дня -это время, в течение которого токен остаётся действительным.
-        },
-      );
+      const token = jwt.sign({ _id: user._id }, JWT_SECRET || 'JWT_SECRET', {
+        expiresIn: '7d', // 7 дня -это время, в течение которого токен остаётся действительным.
+      });
       // res.cookie('auth', token, {
       //   maxAge: 3600000 * 24 * 7,
       //   httpOnly: true,
       // });
       res.send({ token }); // аутентификация успешна
     })
-  //    })
+    //    })
     .catch(next); // ошибка аутентификации
 };
 
@@ -78,11 +73,10 @@ const getUsers = (req, res, next) => {
 
 const getUserMy = (req, res, next) => {
   User.findById(req.user._id)
+    // eslint-disable-next-line
     .then((user) => {
       if (!user) {
-        next( // return
-          new NotFound('Пользователь по указанному _id не найден'),
-        );
+        return next(new NotFound('Пользователь по указанному _id не найден')); // eslint ругается на return...не удалось с этим разобраться..
       }
       res.send({ user });
     })
@@ -92,9 +86,11 @@ const getUserMy = (req, res, next) => {
 const getUserId = (req, res, next) => {
   const { userId } = req.params;
   User.findById(userId)
+    // eslint-disable-next-line
     .then((user) => {
       if (!user) {
-        next( // return
+        return next(
+          // eslint ругается на return...не удалось с этим разобраться..
           new NotFound('Пользователь по указанному _id не найден'),
         );
       }
@@ -140,9 +136,7 @@ const changeAvatar = (req, res, next) => {
   )
     .then((user) => {
       if (!user) {
-        next(
-          new NotFound('Пользователь по указанному _id не найден'),
-        );
+        next(new NotFound('Пользователь по указанному _id не найден'));
       }
       res.send({ user });
     })
