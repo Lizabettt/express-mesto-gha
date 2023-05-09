@@ -2,13 +2,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/users');
 
-// console.log(User);
-const {
-  Conflict,
-  BadRequest,
-  NotFound,
-  //  AuthorizationError,
-} = require('../errors');
+const { Conflict, BadRequest, NotFound } = require('../errors');
 
 const { JWT_SECRET } = process.env;
 
@@ -23,7 +17,7 @@ const createUser = (req, res, next) => {
       avatar,
       email,
       password: hash,
-    }) // записываем хеш в базу
+    })
       .then((newUser) => res.status(201).send({
         name: newUser.name,
         about: newUser.about,
@@ -47,22 +41,15 @@ const createUser = (req, res, next) => {
 
 const login = (req, res, next) => {
   const { email, password } = req.body;
-  console.log(req.body);
   User.findUserByCredentials(email, password)
     .then((user) => {
-      console.log(user);
-
       const token = jwt.sign({ _id: user._id }, JWT_SECRET || 'JWT_SECRET', {
         expiresIn: '7d', // 7 дня -это время, в течение которого токен остаётся действительным.
       });
-      // res.cookie('auth', token, {
-      //   maxAge: 3600000 * 24 * 7,
-      //   httpOnly: true,
-      // });
       res.send({ token }); // аутентификация успешна
     })
     //    })
-    .catch(next); // ошибка аутентификации
+    .catch(next);
 };
 
 const getUsers = (req, res, next) => {

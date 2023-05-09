@@ -27,20 +27,15 @@ const deleteCard = (req, res, next) => {
   Card.findById(cardId)
     .then((card) => {
       if (!card) {
-        next(
-          new NotFound('Карточка с указанным _id не найдена.'),
-        );
+        next(new NotFound('Карточка с указанным _id не найдена.'));
       } else {
-        //  res.send({ card });
         const owner = card.owner.toString();
         if (req.user._id === owner) {
           Card.deleteOne(card).then(() => {
             res.send({ card });
           });
         } else {
-          next(
-            new Forbiden('Чужие карточки удалить нельзя!'),
-          );
+          next(new Forbiden('Чужие карточки удалить нельзя!'));
         }
       }
     })
@@ -49,7 +44,8 @@ const deleteCard = (req, res, next) => {
         next(
           new BadRequest('Переданы некорректные данные для удаления карточки.'),
         );
-      } next(err);
+      }
+      next(err);
     });
 };
 
@@ -61,9 +57,7 @@ const onLikedCard = (req, res, next) => {
   )
     .then((card) => {
       if (!card) {
-        next(
-          new NotFound('Карточка с указанным _id не найдена.'),
-        );
+        next(new NotFound('Карточка с указанным _id не найдена.'));
       } else {
         res.send({ card });
       }
@@ -73,7 +67,8 @@ const onLikedCard = (req, res, next) => {
         next(
           new BadRequest('Переданы некорректные данные для постановки лайка'),
         );
-      } next(err);
+      }
+      next(err);
     });
 };
 
@@ -85,19 +80,16 @@ const offLikedCard = (req, res, next) => {
   )
     .then((card) => {
       if (!card) {
-        next(
-          new NotFound('Карточка с указанным _id не найдена.'),
-        );
+        next(new NotFound('Карточка с указанным _id не найдена.'));
       } else {
         res.send({ card });
       }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(
-          new BadRequest('Переданы некорректные данные для снятия лайка'),
-        );
-      } next(err);
+        next(new BadRequest('Переданы некорректные данные для снятия лайка'));
+      }
+      next(err);
     });
 };
 

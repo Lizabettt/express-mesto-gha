@@ -6,7 +6,7 @@ const auth = require('../middlewares/auth');
 const { login, createUser } = require('../controllers/users');
 const { NotFound } = require('../errors');
 // eslint-disable-next-line
-const regURL = /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/;
+const regURL =/^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/;
 // eslint-disable-next-line
 const regEmail = /^\S+@\S+\.\S+$/;
 
