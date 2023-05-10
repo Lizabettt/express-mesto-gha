@@ -29,15 +29,16 @@ const deleteCard = (req, res, next) => {
     .then((card) => {
       if (!card) {
         next(new NotFound('Карточка с указанным _id не найдена.'));
+        return
       } else {
         const owner = card.owner.toString();
         if (req.user._id === owner) {
-          Card.deleteOne(card).then(() => {
+          return Card.deleteOne(card).then(() => {
             res.send({ card });
           });
-          return;
         }
         next(new Forbiden('Чужие карточки удалить нельзя!'));
+        return
       }
     })
     .catch((err) => {
@@ -45,6 +46,7 @@ const deleteCard = (req, res, next) => {
         next(
           new BadRequest('Переданы некорректные данные для удаления карточки.'),
         );
+        return
       }
       next(err);
     });
@@ -59,6 +61,7 @@ const onLikedCard = (req, res, next) => {
     .then((card) => {
       if (!card) {
         next(new NotFound('Карточка с указанным _id не найдена.'));
+        return
       } else {
         res.send({ card });
       }
@@ -68,6 +71,7 @@ const onLikedCard = (req, res, next) => {
         next(
           new BadRequest('Переданы некорректные данные для постановки лайка'),
         );
+        return
       }
       next(err);
     });
@@ -82,6 +86,7 @@ const offLikedCard = (req, res, next) => {
     .then((card) => {
       if (!card) {
         next(new NotFound('Карточка с указанным _id не найдена.'));
+        return
       } else {
         res.send({ card });
       }
@@ -89,6 +94,7 @@ const offLikedCard = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new BadRequest('Переданы некорректные данные для снятия лайка'));
+        return
       }
       next(err);
     });

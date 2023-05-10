@@ -30,9 +30,11 @@ const createUser = (req, res, next) => {
           next(
             new Conflict('Пользователь с такими данными уже зарегистрирован'),
           );
+          return
         }
         if (err.name === 'ValidationError') {
           next(new BadRequest('Ошибка заполнения поля'));
+          return
         }
         next(err);
       });
@@ -88,6 +90,7 @@ const getUserId = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new BadRequest('Переданы некорректные данные'));
+        return
       }
       next(err);
     });
@@ -103,6 +106,7 @@ const changeUserData = (req, res, next) => {
     .then((user) => {
       if (!user) {
         next(new NotFound('Пользователь по указанному _id не найден'));
+        return
       }
       res.send({ user });
     })
@@ -111,6 +115,7 @@ const changeUserData = (req, res, next) => {
         next(
           new BadRequest('Переданы некорректные данные при обновлении профиля'),
         );
+        return
       }
       next(err);
     });
@@ -126,14 +131,16 @@ const changeAvatar = (req, res, next) => {
     .then((user) => {
       if (!user) {
         next(new NotFound('Пользователь по указанному _id не найден'));
+        return
       }
       res.send({ user });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return next(
+        next(
           new BadRequest('Переданы некорректные данные при обновлении профиля'),
         );
+        return
       }
       return next(err);
     });
