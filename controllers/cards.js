@@ -11,6 +11,7 @@ const createCard = (req, res, next) => {
         next(
           new BadRequest('Переданы некорректные данные при создании карточки.'),
         );
+        return
       }
       next(err);
     });
@@ -31,7 +32,7 @@ const deleteCard = (req, res, next) => {
       } else {
         const owner = card.owner.toString();
         if (req.user._id === owner) {
-          Card.deleteOne(card).then(() => {
+          return Card.deleteOne(card).then(() => {
             res.send({ card });
           });
         } else {
@@ -53,7 +54,7 @@ const onLikedCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } },
-    { new: true, runValidators: true },
+    { new: true },
   )
     .then((card) => {
       if (!card) {
@@ -76,7 +77,7 @@ const offLikedCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } },
-    { new: true, runValidators: true },
+    { new: true },
   )
     .then((card) => {
       if (!card) {

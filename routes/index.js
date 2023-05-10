@@ -7,8 +7,6 @@ const { login, createUser } = require('../controllers/users');
 const { NotFound } = require('../errors');
 // eslint-disable-next-line
 const regURL =/^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/;
-// eslint-disable-next-line
-const regEmail = /^\S+@\S+\.\S+$/;
 
 router.post(
   '/signin',
@@ -28,7 +26,7 @@ router.post(
       name: Joi.string().min(2).max(30),
       about: Joi.string().min(2).max(30),
       avatar: Joi.string().regex(regURL),
-      email: Joi.string().required().regex(regEmail),
+      email: Joi.string().required().email(),
       password: Joi.string().required(),
     }),
   }),
@@ -37,7 +35,7 @@ router.post(
 
 router.use('/users', auth, userRouter);
 router.use('/cards', auth, cardRouter);
-router.use('*', (req, res, next) => {
+router.use('*', auth, (req, res, next) => {
   next(new NotFound('Такой страницы не существует'));
 });
 

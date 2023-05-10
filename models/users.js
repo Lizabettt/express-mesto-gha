@@ -7,14 +7,12 @@ const userSchema = new mongoose.Schema({
   name: {
     default: 'Жак-Ив Кусто',
     type: String,
-    required: true,
     minlength: 2,
     maxlength: 30,
   },
   about: {
     default: 'Исследователь',
     type: String,
-    required: true,
     minlength: 2,
     maxlength: 30,
   },
@@ -22,8 +20,6 @@ const userSchema = new mongoose.Schema({
     default:
       'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
     type: String,
-    required: true,
-    minlength: 2,
     validate: {
       validator: validator.isURL,
       message: 'Введёнa некорректная ссылка',
@@ -48,10 +44,11 @@ const userSchema = new mongoose.Schema({
 userSchema.statics.findUserByCredentials = function (email, password) {
   return this.findOne({ email })
     .select('+password')
-    .then((user) => { // получаем объект пользователя, если почта и пароль подошли
+    .then((user) => {
+      // получаем объект пользователя, если почта и пароль подошли
       if (!user) {
         return Promise.reject(
-          new AuthorizationError('Неправильные почта или пароль'),
+          new AuthorizationError('Неправильные почта или пароль')
         );
       }
       return bcrypt
@@ -59,7 +56,7 @@ userSchema.statics.findUserByCredentials = function (email, password) {
         .then((matched) => {
           if (!matched) {
             return Promise.reject(
-              new AuthorizationError('Неправильные почта или пароль'),
+              new AuthorizationError('Неправильные почта или пароль')
             );
           }
           return user; // теперь user доступен

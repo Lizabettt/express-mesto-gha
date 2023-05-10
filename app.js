@@ -29,10 +29,6 @@ const { errors } = require('celebrate');
 const router = require('./routes');
 
 app.use(router);
-// app.use('*', (req, res, next) => {
-//   next(new NotFound('Такой страницы не существует'));
-// });
-
 app.use(errors());
 
 app.use((err, req, res, next) => {
