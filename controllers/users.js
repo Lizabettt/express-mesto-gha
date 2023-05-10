@@ -63,11 +63,9 @@ const getUsers = (req, res, next) => {
 
 const getUserMy = (req, res, next) => {
   User.findById(req.user._id)
-    // eslint-disable-next-line
     .then((user) => {
       if (!user) {
-        next(new NotFound('Пользователь по указанному _id не найден')); // спасибо)
-        return;
+        next(new NotFound('Пользователь по указанному _id не найден'));         return;
       }
       res.send({ user });
     })
@@ -77,7 +75,6 @@ const getUserMy = (req, res, next) => {
 const getUserId = (req, res, next) => {
   const { userId } = req.params;
   User.findById(userId)
-    // eslint-disable-next-line
     .then((user) => {
       if (!user) {
         next(
