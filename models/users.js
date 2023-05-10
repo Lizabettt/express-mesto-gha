@@ -48,7 +48,7 @@ userSchema.statics.findUserByCredentials = function (email, password) {
       // получаем объект пользователя, если почта и пароль подошли
       if (!user) {
         return Promise.reject(
-          new AuthorizationError('Неправильные почта или пароль')
+          new AuthorizationError('Неправильные почта или пароль'),
         );
       }
       return bcrypt
@@ -56,7 +56,7 @@ userSchema.statics.findUserByCredentials = function (email, password) {
         .then((matched) => {
           if (!matched) {
             return Promise.reject(
-              new AuthorizationError('Неправильные почта или пароль')
+              new AuthorizationError('Неправильные почта или пароль'),
             );
           }
           return user; // теперь user доступен

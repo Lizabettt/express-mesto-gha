@@ -11,7 +11,7 @@ const createCard = (req, res, next) => {
         next(
           new BadRequest('Переданы некорректные данные при создании карточки.'),
         );
-        return
+        return;
       }
       next(err);
     });
@@ -32,12 +32,12 @@ const deleteCard = (req, res, next) => {
       } else {
         const owner = card.owner.toString();
         if (req.user._id === owner) {
-          return Card.deleteOne(card).then(() => {
+          Card.deleteOne(card).then(() => {
             res.send({ card });
           });
-        } else {
-          next(new Forbiden('Чужие карточки удалить нельзя!'));
+          return;
         }
+        next(new Forbiden('Чужие карточки удалить нельзя!'));
       }
     })
     .catch((err) => {

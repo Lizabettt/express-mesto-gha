@@ -37,7 +37,7 @@ const createUser = (req, res, next) => {
         next(err);
       });
   })
-  .catch(next);
+    .catch(next);
 };
 
 const login = (req, res, next) => {
@@ -64,7 +64,8 @@ const getUserMy = (req, res, next) => {
     // eslint-disable-next-line
     .then((user) => {
       if (!user) {
-        return next(new NotFound('Пользователь по указанному _id не найден')); // eslint ругается на return...не удалось с этим разобраться..
+        next(new NotFound('Пользователь по указанному _id не найден')); // спасибо)
+        return;
       }
       res.send({ user });
     })
@@ -77,10 +78,10 @@ const getUserId = (req, res, next) => {
     // eslint-disable-next-line
     .then((user) => {
       if (!user) {
-        return next(
-          // eslint ругается на return...не удалось с этим разобраться..
+        next(
           new NotFound('Пользователь по указанному _id не найден'),
         );
+        return;
       }
       res.send({ user });
     })
